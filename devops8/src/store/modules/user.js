@@ -1,22 +1,22 @@
 import { login, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
+/* 定义用户共享变量user*/
 const user = {
+  /* 初始化变量 */
   state: {
     token: getToken(),
     name: '',
-    username: '',
-    permission: [],
     avatar: '',
-    roles: []
+    roles: [],
+    perms: []
   },
-
+  /* 修改变量 */
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
     },
     SET_NAME: (state, name) => {
-      if (name === null) return
       state.name = name
     },
     SET_AVATAR: (state, avatar) => {
@@ -25,11 +25,8 @@ const user = {
     SET_ROLES: (state, roles) => {
       state.roles = roles
     },
-    SET_USERNAME: (state, username) => {
-      state.username = username
-    },
-    SET_PERMISSION: (state, permission) => {
-      state.permission = permission
+    SET_PERMS: (state, perms) => {
+      state.perms = perms
     }
   },
 
@@ -39,7 +36,6 @@ const user = {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         login(username, userInfo.password).then(response => {
-          console.log(response)
           setToken(response.token)
           commit('SET_TOKEN', response.token)
           resolve()
@@ -49,13 +45,13 @@ const user = {
       })
     },
 
-    // 获取用户信息
+    // 获取用户信息,将用户名和角色存入共享数据中
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo(state.token).then(response => {
-          commit('SET_USERNAME', response.username)
+        getInfo().then(response => {
           commit('SET_NAME', response.name)
-          commit('SET_PERMISSION', response.permission)
+          commit('SET_ROLES', response.roles)
+          commit('SET_PERMS', response.perms)
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -65,19 +61,14 @@ const user = {
 
     // 登出
     LogOut({ commit, state }) {
-      return new Promise((resolve, reject) => {
-        commit('SET_TOKEN', '')
-        commit('SET_NAME', '')
-        removeToken()
-        resolve()
-      })
+      commit('SET_TOKEN', '')
+      removeToken()
     },
 
     // 前端 登出
     FedLogOut({ commit }) {
       return new Promise(resolve => {
         commit('SET_TOKEN', '')
-        commit('SET_NAME', '')
         removeToken()
         resolve()
       })

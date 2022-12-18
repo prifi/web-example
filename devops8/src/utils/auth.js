@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 import store from '../store'
-const TokenKey = 'token'
+const TokenKey = 'Token'
 
 export function getToken() {
   return Cookies.get(TokenKey)
@@ -14,8 +14,8 @@ export function removeToken() {
   return Cookies.remove(TokenKey)
 }
 
-export function checkPermission(perm) {
-  if (store.getters.permission.indexOf(perm) > -1) {
+export function checkPerms(perm) {
+  if (store.getters.perms.indexOf(perm) > -1) {
     return true
   }
   return false
